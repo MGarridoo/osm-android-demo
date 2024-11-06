@@ -13,13 +13,13 @@ class MapViewModel @Inject constructor() : ViewModel() {
     var state = MutableStateFlow(MapState(isLoading = true))
         private set
 
-    fun onEvent(event: MapEvent) {
+    /*fun onEvent(event: MapEvent) {
         viewModelScope.launch {
             when(event) {
                 else -> { }
             }
         }
-    }
+    }*/
 
 
 }

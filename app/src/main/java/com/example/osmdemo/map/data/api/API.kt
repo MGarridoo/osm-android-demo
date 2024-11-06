@@ -3,7 +3,6 @@ package com.example.osmdemo.map.data.api
 import com.example.osmdemo.map.data.model.TripResponse
 import com.example.osmdemo.map.data.model.Locations
 import com.example.osmdemo.core.backend.BackendResult
-import com.example.osmdemo.map.data.model.NearbyStopsResponse
 import com.example.osmdemo.map.data.model.StopResponse
 import okhttp3.ResponseBody
 import retrofit2.http.GET
@@ -66,7 +65,7 @@ interface API {
         @Query("originCoordLat") originCoordLat: Double,
         @Query("accessId") accessId: String,
         @Query("format") format: String = "json"
-    ): BackendResult<NearbyStopsResponse>
+    ): BackendResult<ResponseBody>
 
     @GET("departureBoard")
     suspend fun getDepartureBoard(
@@ -90,20 +89,35 @@ interface API {
         @Query("id") journeyId: String,
         @Query("accessId") accessId: String,
         @Query("poly") poly: Int? = null,
-        @Query("polyEnc") polyEnc: String?,
+        @Query("polyEnc") polyEnc: String? = null,
         @Query("lang") lang: String = "es",
         @Query("format") format: String = "json",
     ): BackendResult<StopResponse>
 
     @GET("trip")
     suspend fun searchTrip(
-        @Query("originId") originId: String,
-        @Query("destId") destId: String,
-        @Query("time") time: String? = null,
+        @Query("originId") originId: String? = null,
+        @Query("originCoordLat") originCoordLat: Int? = null,
+        @Query("originCoordLong") originCoordLong: Int? = null,
+        @Query("originCoordName") originCoordName: String? = null,
+        @Query("destId") destId: String? = null,
+        @Query("destCoordLat") destCoordLat: Int? = null,
+        @Query("destCoordLong") destCoordLong: Int? = null,
+        @Query("destCoordName") destCoordName: String? = null,
+        @Query("groupFilter") groupFilter: String? = null,
+        @Query("attributes") attributes: String? = null,
+        @Query("products") products: Int? = null,
+        @Query("totalWalk") totalWalk: String? = null,
+        @Query("totalBike") totalBike: String? = null,
+        @Query("totalCar") totalCard: String? = null,
+        @Query("changeTimePercent") changeTimePercent: Int? = null,
         @Query("maxChange") maxChange: Int? = null,
-        @Query("withFreq") withFreq: Int? = null,
-        @Query("poly") poly: Int? = null,
-        @Query("polyEnc") polyEnc: String? = null,
+        @Query("minChangeTime") minChangeTime: Int? = null,
+        @Query("addChangeTime") addChangeTime: Int? = null,
+        @Query("maxChangeTime") maxChangeTime: Int? = null,
+        @Query("rtMode") rtMode: String? = null,
+        @Query("poly") poly: Int? = 1,
+        @Query("passlist") passlist: Int? = 1,
         @Query("accessId") accessId: String,
         @Query("lang") lang: String = "es",
         @Query("format") format: String = "json"

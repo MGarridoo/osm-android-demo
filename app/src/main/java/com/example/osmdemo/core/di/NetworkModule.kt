@@ -10,6 +10,7 @@ import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
+import okhttp3.Interceptor
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Retrofit
@@ -20,6 +21,13 @@ import javax.inject.Singleton
 @Module
 @InstallIn(SingletonComponent::class)
 object NetworkModule {
+
+    val cacheControlInterceptor = Interceptor { chain ->
+        val request = chain.request().newBuilder()
+            .header("Cache-Control", "no-cache")
+            .build()
+        chain.proceed(request)
+    }
 
     @Provides
     @Singleton
@@ -43,6 +51,7 @@ object NetworkModule {
             .connectTimeout(2, TimeUnit.MINUTES)
             .readTimeout(2, TimeUnit.MINUTES)
             .addInterceptor(logging)
+            .addInterceptor(cacheControlInterceptor)
             .build()
     }
 

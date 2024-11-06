@@ -3,7 +3,6 @@ package com.example.osmdemo.map.domain.repository
 import com.example.osmdemo.map.data.model.TripResponse
 import com.example.osmdemo.map.data.model.Locations
 import com.example.osmdemo.core.backend.BackendResult
-import com.example.osmdemo.map.data.model.NearbyStopsResponse
 import com.example.osmdemo.map.data.model.StopResponse
 import okhttp3.ResponseBody
 
@@ -56,7 +55,7 @@ interface MapRepository {
         originCoordLat: Double,
         accessId: String,
         format: String = "json"
-    ): BackendResult<NearbyStopsResponse>
+    ): BackendResult<ResponseBody>
 
     suspend fun getDepartureBoard(
         time: String,
@@ -81,13 +80,28 @@ interface MapRepository {
     ): BackendResult<StopResponse>
 
     suspend fun searchTrip(
-        originId: String,
-        destId: String,
-        time: String? = null,  // Optional
-        maxChange: Int? = null,  // Optional
-        withFreq: Int? = null,  // Optional
-        poly: Int? = null, // Optional
-        polyEnc: String? = null, // Optional
+        originId: String? = null,
+        originCoordLat: Int? = null,
+        originCoordLong: Int? = null,
+        originCoordName: String? = null,
+        destId: String? = null,
+        destCoordLat: Int? = null,
+        destCoordLong: Int? = null,
+        destCoordName: String? = null,
+        groupFilter: String? = null,
+        attributes: String? = null,
+        products: Int? = null,
+        totalWalk: String? = null,
+        totalBike: String? = null,
+        totalCar: String? = null,
+        changeTimePercent: Int? = null,
+        maxChange: Int? = null,
+        minChangeTime: Int? = null,
+        addChangeTime: Int? = null,
+        maxChangeTime: Int? = null,
+        rtMode: String? = null,
+        poly: Int? = 1,
+        passlist: Int? = 1,
         accessId: String,
         lang: String = "es",
         format: String = "json"

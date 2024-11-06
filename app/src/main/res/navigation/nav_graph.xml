@@ -1,14 +1,71 @@
 <?xml version="1.0" encoding="utf-8"?>
-<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+<navigation
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/nav_graph"
-    app:startDestination="@id/mapFragment">
+    app:startDestination="@id/trips_fragment">
+
+    <fragment
+        android:id="@+id/trips_fragment"
+        android:name="com.example.osmdemo.trips.presentation.TripsFragment"
+        android:label="fragment_trips"
+        tools:layout="@layout/fragment_trips">
+
+        <action
+            android:id="@+id/action_trips_fragment_to_mapFragment"
+            app:destination="@id/mapFragment">
+
+            <argument
+                android:name="trip"
+                app:argType="com.example.osmdemo.map.data.model.Trip"
+                app:nullable="true" />
+
+        </action>
+
+    </fragment>
 
     <fragment
         android:id="@+id/mapFragment"
         android:name="com.example.osmdemo.map.presentation.MapFragment"
         android:label="fragment_map"
-        tools:layout="@layout/fragment_map" />
+        tools:layout="@layout/fragment_map">
+
+        <argument
+            android:name="trip"
+            app:argType="com.example.osmdemo.map.data.model.Trip"
+            app:nullable="true" />
+
+        <action
+            android:id="@+id/action_mapFragment_to_journeyDetailsFragment"
+            app:destination="@id/journeyDetailsFragment" />
+
+    </fragment>
+
+    <fragment
+        android:id="@+id/tripsDetailsFragment"
+        android:name="com.example.osmdemo.trips_details.presentation.TripsDetailsFragment"
+        android:label="fragment_trips_details"
+        tools:layout="@layout/fragment_trips_details">
+
+        <argument
+            android:name="trip"
+            app:argType="com.example.osmdemo.map.data.model.Trip"
+            app:nullable="false" />
+
+    </fragment>
+
+    <fragment
+        android:id="@+id/journeyDetailsFragment"
+        android:name="com.example.osmdemo.journey_details.presentation.JourneyDetailsFragment"
+        android:label="fragment_journey_details"
+        tools:layout="@layout/fragment_journey_details">
+
+        <argument
+            android:name="ref"
+            app:argType="string"
+            app:nullable="false" />
+
+    </fragment>
 
 </navigation>

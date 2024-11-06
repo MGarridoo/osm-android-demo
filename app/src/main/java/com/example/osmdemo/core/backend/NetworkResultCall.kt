@@ -1,6 +1,7 @@
 package com.example.osmdemo.core.backend
 
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Dispatchers.IO
 import kotlinx.coroutines.launch
 import okhttp3.Request
@@ -17,10 +18,13 @@ class NetworkResultCall<T : Any>(
         proxy.enqueue(object : Callback<T> {
 
             override fun onResponse(call: Call<T>, response: Response<T>) {
-                CoroutineScope(IO).launch {
+                val networkResult = handleApi(response)
+                callback.onResponse(this@NetworkResultCall, Response.success(networkResult))
+
+                /*CoroutineScope(Dispatchers.Main).launch {
                     val networkResult = handleApi { response }
                     callback.onResponse(this@NetworkResultCall, Response.success(networkResult))
-                }
+                }*/
             }
 
             override fun onFailure(call: Call<T>, t: Throwable) {

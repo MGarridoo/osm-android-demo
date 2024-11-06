@@ -4,7 +4,6 @@ import com.example.osmdemo.map.data.model.TripResponse
 import com.example.osmdemo.map.data.model.Locations
 import com.example.osmdemo.core.backend.BackendResult
 import com.example.osmdemo.map.data.api.API
-import com.example.osmdemo.map.data.model.NearbyStopsResponse
 import com.example.osmdemo.map.data.model.StopResponse
 import com.example.osmdemo.map.domain.repository.MapRepository
 import okhttp3.ResponseBody
@@ -103,7 +102,7 @@ class MapRepositoryImpl @Inject constructor(
         originCoordLat: Double,
         accessId: String,
         format: String
-    ): BackendResult<NearbyStopsResponse> {
+    ): BackendResult<ResponseBody> {
         return api.searchNearbyStops(
             originCoordLong = originCoordLong,
             originCoordLat = originCoordLat,
@@ -157,30 +156,61 @@ class MapRepositoryImpl @Inject constructor(
     }
 
     override suspend fun searchTrip(
-        originId: String,
-        destId: String,
-        time: String?,
+        originId: String?,
+        originCoordLat: Int?,
+        originCoordLong: Int?,
+        originCoordName: String?,
+        destId: String?,
+        destCoordLat: Int?,
+        destCoordLong: Int?,
+        destCoordName: String?,
+        groupFilter: String?,
+        attributes: String?,
+        products: Int?,
+        totalWalk: String?,
+        totalBike: String?,
+        totalCar: String?,
+        changeTimePercent: Int?,
         maxChange: Int?,
-        withFreq: Int?,
+        minChangeTime: Int?,
+        addChangeTime: Int?,
+        maxChangeTime: Int?,
+        rtMode: String?,
         poly: Int?,
-        polyEnc: String?,
+        passlist: Int?,
         accessId: String,
         lang: String,
-        format: String
+        format: String,
     ): BackendResult<TripResponse> {
         return api.searchTrip(
             originId = originId,
+            originCoordLat = originCoordLat,
+            originCoordLong = originCoordLong,
+            originCoordName = originCoordName,
             destId = destId,
-            time = time,  // Opcional
-            maxChange = maxChange,  // Opcional
-            withFreq = withFreq,  // Opcional
+            destCoordLat = destCoordLat,
+            destCoordLong = destCoordLong,
+            destCoordName = destCoordName,
+            groupFilter = groupFilter,
+            attributes = attributes,
+            products = products,
+            totalWalk = totalWalk,
+            totalBike = totalBike,
+            totalCard = totalCar,
+            changeTimePercent = changeTimePercent,
+            maxChangeTime = maxChangeTime,
+            addChangeTime = addChangeTime,
+            maxChange = maxChange,
+            minChangeTime = minChangeTime,
+            rtMode = rtMode,
             poly = poly,
-            polyEnc = polyEnc,
+            passlist = passlist,
             accessId = accessId,
             lang = lang,
             format = format
         )
     }
+
 
     override suspend fun searchTripDoorToDoor(
         originCoordLong: Double,
