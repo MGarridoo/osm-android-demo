@@ -1,8 +1,12 @@
 package com.example.osmdemo.map.presentation
 
+import android.graphics.Bitmap
+import android.graphics.Canvas
 import com.example.osmdemo.map.data.model.Trip
 import android.graphics.Color
 import android.graphics.DashPathEffect
+import android.graphics.Paint
+import android.graphics.drawable.BitmapDrawable
 import android.os.Bundle
 import android.util.Log
 import androidx.fragment.app.Fragment
@@ -10,10 +14,12 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.activity.addCallback
+import androidx.core.content.ContextCompat
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import com.example.osmdemo.BuildConfig
+import com.example.osmdemo.R
 import com.example.osmdemo.core.backend.BackendResult
 import com.example.osmdemo.databinding.FragmentMapBinding
 import com.example.osmdemo.map.data.model.GisRoute
@@ -38,7 +44,7 @@ class MapFragment : Fragment() {
 
     private val accessId = BuildConfig.API_KEY // Token del API
 
-    private val geoPoints = mutableListOf<GeoPoint>() // Listado de geoPoints
+    //private val geoPoints = mutableListOf<GeoPoint>() // Listado de geoPoints
 
     @Inject
     lateinit var map: MapRepository
@@ -97,23 +103,51 @@ class MapFragment : Fragment() {
         val legs = trip.legList.leg
 
         legs.forEachIndexed { index, leg ->
-            //val stops = leg.freq?.journey
             val startPoint = GeoPoint(leg.origin.lat, leg.origin.lon)
             val endPoint = GeoPoint(leg.destination.lat, leg.destination.lon)
             val ref = leg.gisRef?.ref
 
+            // Colocar marcador en el punto de inicio (Punto A)
             if (index == 0) {
-                //placeMarker(startPoint.latitude, startPoint.longitude, leg.origin.name)
+                placeMarker(
+                    lat = startPoint.latitude,
+                    lon = startPoint.longitude,
+                    type = "A",
+                    title = "Punto A: ${leg.origin.name}"
+                )
             }
 
-            //placeMarker(endPoint.latitude, endPoint.longitude, leg.destination.name)
+            // Colocar marcador en el punto de destino (Punto B)
+            if (index == legs.size - 1) {
+                placeMarker(
+                    lat = endPoint.latitude,
+                    lon = endPoint.longitude,
+                    type = "B",
+                    title = "Punto B: ${leg.destination.name}"
+                )
+            }
 
+            // Iterar sobre las paradas (stops) del leg
+            leg.stops?.stop?.forEach { stop ->
+                val geoPoint = GeoPoint(stop.lat!!, stop.lon!!)
+                placeCircularStopMarker(
+                    lat = geoPoint.latitude,
+                    lon = geoPoint.longitude,
+                    title = stop.name ?: "Parada"
+                )
+            }
+
+            // Si hay polilínea disponible, dibujarla (ruta de BUS)
             if (leg.polylineGroup != null) {
-                // Si hay polilínea disponible, dibujarla
                 drawPolylineFromGroup(leg.polylineGroup)
             } else {
                 when (leg.type) {
-                    "WALK" -> { if (ref != null) { getGisRouteAndDraw(ref) } }
+                    "WALK" -> {
+                        if (ref != null) {
+                            // Se realiza petición de GisRoute para dibujar ruta a pie
+                            getGisRouteAndDraw(ref)
+                        }
+                    }
                     "JNY" -> { }
                 }
             }
@@ -154,6 +188,9 @@ class MapFragment : Fragment() {
 
         when (gisRouteResult) {
             is BackendResult.Success -> {
+                Log.d("TAG", "getGisRouteAndDraw: walk -> ${gisRouteResult.data.trip.size}")
+
+
                 val trip = gisRouteResult.data.trip[0]
                 val leg = trip.legList.leg[0]
                 if (leg.gisRoute != null) { drawGisRoute(leg.gisRoute) }
@@ -188,11 +225,66 @@ class MapFragment : Fragment() {
     }
 
     // Colocar marcador en el mapa
-    private fun placeMarker(lat: Double, lon: Double, title: String) {
+    private fun placeMarker(lat: Double, lon: Double, type: String, title: String) {
         val marker = Marker(binding.map)
+        val icon = if (type == "A") R.drawable.haf_prod_marker_entire_a else R.drawable.haf_prod_marker_entire_b
+        val vectorDrawable = ContextCompat.getDrawable(requireContext(), icon)
+
         marker.position = GeoPoint(lat, lon)
         marker.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM)
         marker.title = title
+
+        if (vectorDrawable != null) {
+            val desiredWidth = 100
+            val desiredHeight = 100
+            vectorDrawable.setBounds(0, 0, desiredWidth, desiredHeight)
+
+            // Convertir el VectorDrawable en Bitmap para establecer el tamaño
+            val bitmap = Bitmap.createBitmap(desiredWidth, desiredHeight, Bitmap.Config.ARGB_8888)
+            val canvas = Canvas(bitmap)
+            vectorDrawable.draw(canvas)
+
+            // Asignar el BitmapDrawable al marcador
+            marker.icon = BitmapDrawable(resources, bitmap)
+        }
+
+        binding.map.overlays.add(marker)
+    }
+
+    // Colocar marcador de las paradas en el mapa
+    private fun placeCircularStopMarker(lat: Double, lon: Double, title: String) {
+        val marker = Marker(binding.map)
+        marker.position = GeoPoint(lat, lon)
+        marker.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_CENTER)
+        marker.title = title
+
+        // Crear un icono circular rojo con un centro blanco
+        val outerRadius = 30  // Tamale del círculo rojo
+        val innerRadius = 15  // Tamaño del punto blanco en el centro
+        val bitmap = Bitmap.createBitmap(outerRadius * 2, outerRadius * 2, Bitmap.Config.ARGB_8888)
+        val canvas = Canvas(bitmap)
+
+        // Pintura para el círculo rojo
+        val outerPaint = Paint().apply {
+            color = Color.RED
+            style = Paint.Style.FILL
+            isAntiAlias = true
+        }
+        // Pintura para el punto blanco en el centro
+        val innerPaint = Paint().apply {
+            color = Color.WHITE
+            style = Paint.Style.FILL
+            isAntiAlias = true
+        }
+
+        // Dibujar el círculo rojo exterior
+        canvas.drawCircle(outerRadius.toFloat(), outerRadius.toFloat(), outerRadius.toFloat(), outerPaint)
+        // Dibujar el punto blanco en el centro
+        canvas.drawCircle(outerRadius.toFloat(), outerRadius.toFloat(), innerRadius.toFloat(), innerPaint)
+
+        // Asignar el bitmap como icono del marcador
+        marker.icon = BitmapDrawable(resources, bitmap)
+
         binding.map.overlays.add(marker)
     }
 

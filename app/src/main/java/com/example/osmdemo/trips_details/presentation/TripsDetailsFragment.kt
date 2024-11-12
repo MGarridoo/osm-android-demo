@@ -67,7 +67,11 @@ class TripsDetailsFragment : BottomSheetDialogFragment(), OnLegClickListener {
             trip.legList.leg.forEach { leg ->
                 when(leg.type) {
                     "WALK" -> {
-                        val result = map.getGISRoute(ctx = leg.gisRef!!.ref, poly = 1, accessId = accessId)
+                        val result = map.getGISRoute(
+                            ctx = leg.gisRef!!.ref,
+                            poly = 1,
+                            accessId = accessId
+                        )
                         when (result) {
                             is BackendResult.Success -> { result.data.trip.forEach { gisRoute.add(it) } }
                             is BackendResult.Error -> Log.e("TAG", "Error fetching GIS route")
