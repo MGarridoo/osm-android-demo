@@ -1,16 +1,17 @@
 package com.example.osmdemo.core.di
 
-import com.example.osmdemo.map.data.model.LocationResponse
-import LocationResponseAdapter
-import com.example.osmdemo.core.backend.adapters.NetworkResultCallAdapterFactory
-import com.example.osmdemo.map.data.api.API
+import com.example.osmdemo.BuildConfig
+import com.example.osmdemo.core.backend.api.DevMaasAPI
+import com.example.osmdemo.core.backend.api.HafasHaconAPI
+import com.example.osmdemo.core.backend.api.NominatimAPI
+import com.example.osmdemo.core.backend.utils.NetworkResultCallAdapterFactory
+import com.example.osmdemo.core.backend.api.API
 import com.google.gson.Gson
 import com.google.gson.GsonBuilder
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
-import okhttp3.Interceptor
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Retrofit
@@ -21,13 +22,6 @@ import javax.inject.Singleton
 @Module
 @InstallIn(SingletonComponent::class)
 object NetworkModule {
-
-    val cacheControlInterceptor = Interceptor { chain ->
-        val request = chain.request().newBuilder()
-            .header("Cache-Control", "no-cache")
-            .build()
-        chain.proceed(request)
-    }
 
     @Provides
     @Singleton
@@ -51,23 +45,15 @@ object NetworkModule {
             .connectTimeout(2, TimeUnit.MINUTES)
             .readTimeout(2, TimeUnit.MINUTES)
             .addInterceptor(logging)
-            .addInterceptor(cacheControlInterceptor)
             .build()
     }
 
     @Provides
-    fun provideRetrofit(client: OkHttpClient, /*gson: Gson*/): Retrofit {
+    fun provideRetrofit(client: OkHttpClient): Retrofit {
         return Retrofit.Builder()
-            .addConverterFactory(
-                GsonConverterFactory.create(
-                    GsonBuilder()
-                        .registerTypeAdapter(LocationResponse::class.java, LocationResponseAdapter())
-                        .setLenient()
-                        .create()
-                )
-            )
+            .addConverterFactory(GsonConverterFactory.create(GsonBuilder().setLenient().create()))
             .addCallAdapterFactory(NetworkResultCallAdapterFactory.create())
-            .baseUrl("https://moovia.demo.hafas.cloud/restproxy/")
+            .baseUrl(BuildConfig.BASE_URL)
             .client(client)
             .build()
     }
@@ -76,6 +62,30 @@ object NetworkModule {
     @Singleton
     fun provideAPI(retrofit: Retrofit): API {
         return retrofit.create(API::class.java)
+    }
+
+    @Provides
+    @Singleton
+    fun provideHafasHaconAPI(retrofit: Retrofit) : HafasHaconAPI {
+        return retrofit.create(HafasHaconAPI::class.java)
+    }
+
+    @Provides
+    @Singleton
+    fun provideDevMaasAPI(retrofit: Retrofit) : DevMaasAPI {
+        return retrofit.create(DevMaasAPI::class.java)
+    }
+
+    @Provides
+    @Singleton
+    fun provideNominatimAPI(client: OkHttpClient) : NominatimAPI {
+        val retrofit = Retrofit.Builder()
+            .baseUrl("https://nominatim.openstreetmap.org/")
+            .addConverterFactory(GsonConverterFactory.create(GsonBuilder().setLenient().create()))
+            .addCallAdapterFactory(NetworkResultCallAdapterFactory.create())
+            .client(client)
+            .build()
+        return retrofit.create(NominatimAPI::class.java)
     }
 
 }

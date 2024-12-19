@@ -1,7 +1,143 @@
 package com.example.osmdemo.utils
 
+import com.example.osmdemo.features.options.domain.AccessType
+import com.example.osmdemo.features.options.domain.CyclingDistance
+import com.example.osmdemo.features.options.domain.CyclingSpeedType
+import com.example.osmdemo.features.options.domain.OptionItem
+import com.example.osmdemo.features.options.domain.OptionType
+import com.example.osmdemo.features.options.domain.SectionItem
+import com.example.osmdemo.features.options.domain.DrivingSpeedType
+import com.example.osmdemo.features.options.domain.TransferType
+import com.example.osmdemo.features.options.domain.WalkingDistance
+import com.example.osmdemo.features.options.domain.WalkingSpeedType
 
-val routeString = "G|1|G@F|A=1@O=Calle 57 C - 3@L=61337@a=128@i=A×61337@|A=4@O=El Campin, Avenida Carrera 14, UPZ Chapinero@X=-74065460@Y=4643881@L=980010843@a=128@|24102024|152500|152700|fb|ft@0@2000@120@0@100@1@0@0@@@@@false@0@-1@0@-1@-1@\$f@\$f@\$f@\$f@\$f@§bt@0@2000@120@1@100@1@0@0@@@@@false@0@-1@0@-1@-1@\$f@\$f@\$f@\$f@\$f@§tt@0@5000@120@0@100@1@0@0@@@@@false@0@-1@0@-1@-1@\$f@\$f@\$f@\$f@\$f@§|||||"
-
-
-val routeString2 = "G|1|G@F|A=4@O=La Parrilla Moderna, Transversal 93, UPZ Álamos@X=-74119018@Y=4687623@L=980035049@a=128@|A=1@O=Eldorado 16-10 Villemar@L=57933@a=128@i=A×57933@|24102024|142700|144600|bf|ft@0@2000@120@0@100@1@0@0@@@@@false@0@-1@0@-1@-1@\$f@\$f@\$f@\$f@\$f@§bt@0@2000@120@0@100@1@0@0@@@@@false@0@-1@0@-1@-1@\$f@\$f@\$f@\$f@\$f@§tt@0@5000@120@0@100@1@0@0@@@@@false@0@-1@0@-1@-1@\$f@\$f@\$f@\$f@\$f@§|||||±H|1|W\$A=1@O=Eldorado 16-10 Villemar@L=57933@a=128@\$A=1@O=Portal Eldorado T-3B@L=73234@a=128@\$202410241446\$202410241452\$\$\$1\$\$\$\$\$\$|#VE#2#CF#150#CA#3#CM#0#SICT#0#AM#49#AM2#0#RT#4#"
+val menuOptions = mutableListOf(
+    SectionItem(
+        title = "Services (Medios de transporte)",
+        options = mutableListOf(
+            OptionItem(
+                optionTitle = "Bus",
+                optionType = OptionType.SWITCH,
+                selectedOption = true
+            ),
+            OptionItem(
+                optionTitle = "Cable car",
+                optionType = OptionType.SWITCH,
+                selectedOption = true
+            ),
+        )
+    ),
+    SectionItem(
+        title = "Transfers (Transbordos)",
+        options = mutableListOf(
+            OptionItem(
+                optionTitle = "Direct trips only (Sólo enlaces directos)",
+                optionType = OptionType.SWITCH,
+                selectedOption = false
+            ),
+            OptionItem(
+                optionTitle = "Number of transfers (Número de transbordos)",
+                optionType = OptionType.SPINNER,
+                spinnerOptions = listOf(
+                    TransferType.UNLIMITED,
+                    TransferType.NONE,
+                    TransferType.MAX_1,
+                    TransferType.MAX_2,
+                    TransferType.MAX_3
+                ),
+                selectedOption = TransferType.UNLIMITED
+            ),
+            OptionItem(
+                optionTitle = "Plan longer transfer times (Tiempo de transbordos más largos)",
+                optionType = OptionType.SWITCH,
+                selectedOption = true
+            )
+        )
+    ),
+    SectionItem(
+        title = "Walk (Ruta a pie)",
+        options = mutableListOf(
+            OptionItem(
+                optionTitle = "Walking distance to stop (Recorrido a pie hasta la parada)",
+                optionType = OptionType.SPINNER,
+                spinnerOptions = listOf(
+                    WalkingDistance.WITHOUT,
+                    WalkingDistance.MAX_0_3,
+                    WalkingDistance.MAX_0_6,
+                    WalkingDistance.MAX_1_2,
+                    WalkingDistance.MAX_3_1
+                ),
+                selectedOption = WalkingDistance.MAX_1_2
+            ),
+            OptionItem(
+                optionTitle = "Walking speed (Velocidad a pie)",
+                optionType = OptionType.SPINNER,
+                spinnerOptions = listOf(
+                    WalkingSpeedType.SLOW,
+                    WalkingSpeedType.NORMAL,
+                    WalkingSpeedType.FAST
+                ),
+                selectedOption = WalkingSpeedType.NORMAL
+            ),
+        )
+    ),
+    SectionItem(
+        title = "Bike (Bicicleta)",
+        options = mutableListOf(
+            OptionItem(
+                optionTitle = "Bicycle transport (Transporte de bicicleta)",
+                optionType = OptionType.SWITCH,
+                selectedOption = false
+            ),
+            OptionItem(
+                optionTitle = "Cycling distance to stop (Recorrido con bicicleta hasta la parada)",
+                optionType = OptionType.SPINNER,
+                spinnerOptions = listOf(
+                    CyclingDistance.WITHOUT,
+                    CyclingDistance.MAX_0_6,
+                    CyclingDistance.MAX_1_2,
+                    CyclingDistance.MAX_3_1,
+                    CyclingDistance.MAX_6_2,
+                    CyclingDistance.MAX_12_4
+                ),
+                selectedOption = CyclingDistance.WITHOUT
+            ),
+            OptionItem(
+                optionTitle = "Cycling speed (Velocidad de bicicleta)",
+                optionType = OptionType.SPINNER,
+                spinnerOptions = listOf(
+                    CyclingSpeedType.SLOW,
+                    CyclingSpeedType.NORMAL,
+                    CyclingSpeedType.FAST
+                ),
+                selectedOption = CyclingSpeedType.NORMAL
+            ),
+        )
+    ),
+    SectionItem(
+        title = "Driving speed (Velocidad con el coche)",
+        options = mutableListOf(
+            OptionItem(
+                optionTitle = "Driving speed (Velocidad con el coche)",
+                optionType = OptionType.SPINNER,
+                spinnerOptions = listOf(DrivingSpeedType.SLOW, DrivingSpeedType.NORMAL, DrivingSpeedType.FAST),
+                selectedOption = DrivingSpeedType.NORMAL
+            ),
+        )
+    ),
+    SectionItem(
+        title = "Travel with disabled access (Opciones de accesibilidad en el trayecto)",
+        options = mutableListOf(
+            OptionItem(
+                optionTitle = "Travel with disabled access (Opciones de accesibilidad en el trayecto)",
+                optionType = OptionType.SPINNER,
+                spinnerOptions = listOf(
+                    AccessType.BARRIER_FREE_ACCESS,
+                    AccessType.LIMITED_ACCESS,
+                    AccessType.NON_BARRIER_FREE
+                ),
+                selectedOption = AccessType.NON_BARRIER_FREE
+            ),
+        )
+    )
+)

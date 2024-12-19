@@ -41,6 +41,24 @@ android {
         }
     }
 
+    flavorDimensions += "version"
+
+    productFlavors {
+        create("hafas") {
+            dimension = "version"
+            applicationIdSuffix = ".hafas"
+            versionNameSuffix = "-hafas"
+            buildConfigField("String", "BASE_URL", "\"https://moovia.demo.hafas.cloud/restproxy/\"")
+        }
+
+        create("dev") {
+            dimension = "version"
+            applicationIdSuffix = ".dev"
+            versionNameSuffix = "-dev"
+            buildConfigField("String", "BASE_URL", "\"http://52.20.240.37:5005/\"")
+        }
+    }
+
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_17
         targetCompatibility = JavaVersion.VERSION_17
@@ -62,6 +80,8 @@ dependencies {
     implementation(libs.material)
     implementation(libs.androidx.activity)
     implementation(libs.androidx.constraintlayout)
+    implementation ("com.google.android.material:material:1.9.0")
+    implementation("androidx.recyclerview:recyclerview:1.2.1")
 
     /** OSM Android*/
     implementation (libs.osmdroid.android)
